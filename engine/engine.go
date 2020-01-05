@@ -76,18 +76,7 @@ func (e *Docker) Setup(ctx context.Context, specv runtime.Spec) error {
 		}
 	}
 
-	// creates the default pod network. All containers
-	// defined in the pipeline are attached to this network.
-	driver := "bridge"
-	if spec.Platform.OS == "windows" {
-		driver = "nat"
-	}
-	_, err := e.client.NetworkCreate(ctx, spec.Network.ID, types.NetworkCreate{
-		Driver: driver,
-		Labels: spec.Network.Labels,
-	})
-
-	return errors.TrimExtraInfo(err)
+	return nil
 }
 
 // Destroy the pipeline environment.
@@ -122,9 +111,6 @@ func (e *Docker) Destroy(ctx context.Context, specv runtime.Spec) error {
 		}
 		e.client.VolumeRemove(ctx, vol.EmptyDir.ID, true)
 	}
-
-	// cleanup the network
-	e.client.NetworkRemove(ctx, spec.Network.ID)
 
 	// notice that we never collect or return any errors.
 	// this is because we silently ignore cleanup failures
